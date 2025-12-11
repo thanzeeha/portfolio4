@@ -19,6 +19,30 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ data, onSave, onLogout }
   useEffect(() => {
     setFormData(data);
   }, [data]);
+  async function saveToGithub(data: any) {
+  const response = await fetch("/api/updateContent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      owner: "thanzeeha",
+      repo: "portfolio4",
+      path: "metadata.json",
+      content: JSON.stringify(data, null, 2),
+      branch: "main",
+      message: "Updated from Admin Panel"
+    })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    alert("GitHub update failed! Check console.");
+    console.error(result);
+    return;
+  }
+
+  alert("Saved to GitHub! Vercel is redeploying your site.");
+}
 
   const handleChange = (field: keyof ProfileData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -125,7 +149,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ data, onSave, onLogout }
           </div>
           <div className="flex gap-3">
             <button 
-                onClick={() => onSave(formData)}
+                onClick={() => saveToGithub(formData)}
                 className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold shadow-lg transition-transform hover:scale-105 active:scale-95"
             >
                 <Save size={18} /> SAVE ALL CHANGES
